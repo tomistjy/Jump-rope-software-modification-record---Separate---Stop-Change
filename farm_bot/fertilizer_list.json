@@ -1,0 +1,56 @@
+[
+  {
+    "product_id": "577877858995668041",
+    "name": "普通肥料",
+    "cover_img": "",
+    "original_price": 5,
+    "product_type": "island_fertilizer",
+    "item_id": 31001,
+    "item_count": 1
+  },
+  {
+    "product_id": "577956614502351945",
+    "name": "高级肥料",
+    "cover_img": "",
+    "original_price": 20,
+    "product_type": "island_fertilizer",
+    "item_id": 31002,
+    "item_count": 1
+  },
+  {
+    "product_id": "577959045604836425",
+    "name": "超级肥料",
+    "cover_img": "",
+    "original_price": 40,
+    "product_type": "island_fertilizer",
+    "item_id": 31003,
+    "item_count": 1
+  },
+  {
+    "product_id": "577959246310671433",
+    "name": "星星肥料",
+    "cover_img": "",
+    "original_price": 5,
+    "product_type": "island_fertilizer",
+    "item_id": 32001,
+    "item_count": 1
+  },
+  {
+    "product_id": "577959381870576713",
+    "name": "月亮肥料",
+    "cover_img": "",
+    "original_price": 38,
+    "product_type": "island_fertilizer",
+    "item_id": 32002,
+    "item_count": 1
+  },
+  {
+    "product_id": "577959929411798089",
+    "name": "太阳肥料",
+    "cover_img": "",
+    "original_price": 58,
+    "product_type": "island_fertilizer",
+    "item_id": 32003,
+    "item_count": 1
+  }
+]

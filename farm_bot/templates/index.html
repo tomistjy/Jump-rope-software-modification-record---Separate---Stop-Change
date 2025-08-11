@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>农场自动化工具</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        body { background: #f8f9fa; padding: 20px; }
+        .card { margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,.1); }
+        .farm-land { border: 1px solid #dee2e6; border-radius: 5px; padding: 10px; margin-bottom: 10px; }
+        .land-mature { color: #28a745; font-weight: bold; }
+        .land-not-mature { color: #dc3545; }
+        .land-empty { color: #6c757d; }
+        
+
+        #logFloat {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 500px;
+            height: 350px;
+            background: #343a40;
+            color: #e9ecef;
+            font-family: Consolas, monospace;
+            font-size: 13px;
+            border-radius: 0 0 0 8px;
+            padding: 10px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+        }
+        #logContent {
+            flex: 1;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        .toast-container { z-index: 99999; }
+
+        .container { max-width: 98vw !important; padding-left: 1rem; padding-right: 1rem; }
+        .table { width: 100% !important; }
+
+        /* 防止 Bootstrap 的 table-hover 或 table-striped 覆盖 */
+        .table tbody tr.search-highlight,
+        .table tbody tr.search-selected {
+            background-color: #ffeb3b !important;
+        }
+
+        .search-highlight td {
+          background-color: #FF8000 !important;
+          color: #000000 !important;
+          font-weight: bold !important;
+        }
+        .search-selected {
+            background-color: #FF8000 !important; /* 深红色 */
+            color: #000000 !important;
+            font-weight: bold !important;
+        }
+
+        .search-highlight td,
+        .search-selected td {
+          background-color: #FF8000 !important;
+          color: #000000 !important;
+          font-weight: bold !important;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1 class="text-center mb-4">农场自动化工具</h1>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="d-flex align-items-center mb-3 flex-wrap gap-2">
+                <select id="accountSelect" class="form-select" style="width:200px">
+                    {% for a in accounts %}
+                    <option value="{{ a }}" {% if a==current_user %}selected{% endif %}>{{ a }}</option>
+                    {% endfor %}
+                </select>
+
+                <button class="btn btn-primary" id="refreshBtn"><i class="bi bi-arrow-clockwise"></i> 刷新</button>
+                <button class="btn btn-success" id="harvestBtn"><i class="bi bi-basket"></i> 一键收获</button>
+                <button class="btn btn-info"    id="waterBtn"><i class="bi bi-droplet"></i> 自动浇水</button>
+                <button class="btn btn-warning" id="fertilizeBtn"><i class="bi bi-flower1"></i> 自动施肥</button>
+                <button class="btn btn-warning" id="buyFertilizerBtn"><i class="bi bi-cart-plus"></i> 购买肥料</button>
+                <button class="btn btn-danger"  id="clearBtn"><i class="bi bi-trash"></i> 清空农场</button>
+                <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#addAccountModal"><i class="bi bi-plus-lg"></i> 添加账号</button>
+            </div>
+
+            <div id="farmInfo" class="mb-3">
+                <div class="d-flex justify-content-center"><div class="spinner-border text-primary"></div></div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th width="60px"><input type="checkbox" id="selectAllLands"></th>
+                            <th>地块</th><th>作物</th><th>等级</th><th>状态</th><th>成熟时间</th>
+                            <th>最后浇水</th><th>水分维持</th><th>被偷人数</th><th>祈福人数</th><th>肥料</th>
+                        </tr>
+                    </thead>
+                    <tbody id="farmLandsList"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">好友菜园</h5>
+            <div class="mb-3">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="searchFriendInput" placeholder="搜索好友昵称">
+                    <button class="btn btn-primary" id="searchFriendBtn"><i class="bi bi-search"></i> 搜索</button>
+                    <button class="btn btn-secondary" id="clearSearchBtn"><i class="bi bi-x-circle"></i> 清除</button>
+                </div>
+            </div>
+            <div class="mb-3">
+                <button class="btn btn-success btn-sm me-2" id="stealBtn"><i class="bi bi-hand-thief"></i> 开始偷菜</button>
+                <button class="btn btn-secondary btn-sm me-2" id="selectAllBtn"><i class="bi bi-check-all"></i> 全选/取消</button>
+                <button class="btn btn-primary btn-sm"   id="refreshFriendsBtn"><i class="bi bi-arrow-clockwise"></i> 刷新好友</button>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th width="60px"><input type="checkbox" id="selectAllFriends"></th>
+                            <th>昵称</th><th>农场等级</th><th>经验值</th><th>蔬菜摊等级</th><th>状态</th><th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="friendsList"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- =====  模态框  ===== -->
+<!-- 添加账号 -->
+<div class="modal fade" id="addAccountModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title">添加临时账号</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <label class="form-label">Authorization</label>
+                <input type="text" class="form-control" id="authInput" placeholder="请输入Authorization">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button class="btn btn-primary" id="confirmAddBtn">确认添加</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 选择肥料 -->
+<div class="modal fade" id="fertilizerModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title">选择肥料</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body" id="fertilizerList"></div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button class="btn btn-primary" id="confirmFertilizeBtn">确认施肥</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 购买肥料 -->
+<div class="modal fade" id="buyFertilizerModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title">购买肥料</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body" id="buyFertilizerList"></div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button class="btn btn-primary" id="confirmBuyFertilizerBtn">确认购买</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- =====  日志悬浮窗  ===== -->
+<div id="logFloat" style="display:none;">
+    <div class="d-flex justify-content-between align-items-center mb-1">
+        <strong>执行日志</strong>
+        <div>
+            <button class="btn btn-sm btn-outline-light" id="scrollToLatestBtn" title="划到最新">⬇</button>
+            <button class="btn btn-sm btn-outline-danger"  id="toggleLogBtn"    title="关闭">✕</button>
+        </div>
+    </div>
+    <div id="logContent"></div>
+</div>
+<button id="openLogBtn" class="btn btn-dark" style="position: fixed; top: 0; right: 0; z-index: 10000;">📄</button>
+
+<!-- =====  JS  ===== -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+<script>
+/* =========  通用工具  ========= */
+function showToast(msg, type = 'success') {
+    const cls = type === 'success' ? 'bg-success' : 'bg-danger';
+    const html = `
+        <div class="toast align-items-center text-white ${cls} border-0" role="alert" data-bs-delay="3000">
+            <div class="d-flex">
+                <div class="toast-body">${msg}</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>`;
+    $('body').append(`<div class="toast-container position-fixed top-0 end-0 p-3">${html}</div>`);
+    $('.toast').last().toast('show');
+}
+
+function loadFarmInfo() {
+    $.get('/get_farm_info')
+        .done(data => {
+            if (data.status === 'success') {
+                updateFarmInfo(data.data);
+                updateFarmLands(data.data.lands);
+                showToast('农场信息已刷新');
+            } else {
+                showToast('农场刷新失败：' + (data.response || '未知错误'), 'error');
+            }
+        })
+        .fail(() => showToast('网络错误或服务器未响应', 'error'));
+}
+
+function updateFarmInfo(data) {
+    $('#farmInfo').html(`
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4>${data.nick_name}</h4>
+            <div>
+                <span class="badge bg-primary me-2">农场等级: ${data.farm_level}</span>
+                <span class="badge bg-success me-2">经验值: ${data.farm_exp}</span>
+                <span class="badge bg-warning">蔬菜摊等级: ${data.veg_stall_level}</span>
+            </div>
+        </div>
+    `);
+}
+
+function updateFarmLands(lands) {
+    let html = '';
+    lands.forEach(l => {
+        const cls = l.mature === '可收' ? 'text-success' : l.mature === '未熟' ? 'text-warning' : 'text-muted';
+        html += `
+        <tr>
+            <td><input class="form-check-input land-checkbox" type="checkbox" value="${l.index}" ${l.mature === '空地' ? 'disabled' : ''}></td>
+            <td>${l.index}</td><td>${l.crop_name}</td><td>${l.level}</td>
+            <td class="${cls}">${l.mature}</td>
+            <td>${l.finish_time}</td><td>${l.water_time}</td><td>${l.wet_time}</td>
+            <td>${l.stolen_count}${l.stolen_count ? `<i class="bi bi-info-circle" title="${l.stolen_users.join(', ')}"></i>` : ''}</td>
+            <td>${l.pray_count}${l.pray_count ? `<i class="bi bi-info-circle" title="${l.pray_users.join(', ')}"></i>` : ''}</td>
+            <td>${l.fertilizers}</td>
+        </tr>`;
+    });
+    $('#farmLandsList').html(html);
+    $('#selectAllLands').off().on('change', function () {
+        $('.land-checkbox:not(:disabled)').prop('checked', this.checked);
+    });
+    $('[title]').tooltip({ boundary: 'window' });
+}
+
+function buildFriendRow(f) {
+    const kw = $('#searchFriendInput').val().trim().toLowerCase();
+    const isMatch = kw && f.nick_name.toLowerCase().includes(kw);
+    const isChecked = $('.friend-checkbox[value="' + f.user_id + '"]').prop('checked');
+    let rowClass = '';
+    if (isMatch && isChecked) rowClass = 'search-selected';
+    else if (isMatch) rowClass = 'search-highlight';
+
+    const states = (f.status || '').split(';').map((s, i) => {
+        const cls = s === '已熟' ? 'text-success' : s === '未熟' ? 'text-warning' : 'text-muted';
+        return `<span class="${cls}">${i + 1}:${s}</span>`;
+    }).join(' ') || '<span class="text-muted">未加载</span>';
+
+    return `
+    <tr class="friend-row ${rowClass} ${f.loaded ? '' : 'table-secondary'}" data-uid="${f.user_id}">
+        <td><input class="form-check-input friend-checkbox" type="checkbox" value="${f.user_id}"></td>
+        <td>${f.nick_name}</td>
+        <td>${f.farm_level}</td>
+        <td>${f.farm_exp}</td>
+        <td>${f.veg_stall_level}</td>
+        <td>${states}</td>
+        <td>
+            <button class="btn btn-sm btn-outline-info view-friend-btn" data-uid="${f.user_id}" data-nick="${f.nick_name}">
+                <i class="bi bi-eye"></i> 查看
+            </button>
+        </td>
+    </tr>`;
+}
+
+function updateFriendsList(friends) {
+    let html = '';
+    friends.forEach(f => {
+        const isChecked = $('.friend-checkbox[value="' + f.user_id + '"]').prop('checked');
+        let rowClass = '';
+        if (f.search_highlight && isChecked) {
+            rowClass = 'search-selected';
+        } else if (f.search_highlight) {
+            rowClass = 'search-highlight';
+        }
+
+        const states = (f.status || '').split(';').map((s, i) => {
+            const cls = s === '已熟' ? 'text-success' : s === '未熟' ? 'text-warning' : 'text-muted';
+            return `<span class="${cls}">${i + 1}:${s}</span>`;
+        }).join(' ') || '<span class="text-muted">未加载</span>';
+
+        html += `
+        <tr class="friend-row ${rowClass}" data-uid="${f.user_id}">
+            <td><input class="form-check-input friend-checkbox" type="checkbox" value="${f.user_id}"></td>
+            <td>${f.nick_name}</td>
+            <td>${f.farm_level ?? '—'}</td>
+            <td>${f.farm_exp ?? '—'}</td>
+            <td>${f.veg_stall_level ?? '—'}</td>
+            <td>${states}</td>
+            <td>
+                <button class="btn btn-sm btn-outline-info view-friend-btn" data-uid="${f.user_id}" data-nick="${f.nick_name}">
+                    <i class="bi bi-eye"></i> 查看
+                </button>
+            </td>
+        </tr>`;
+    });
+    $('#friendsList').html(html);
+}
+
+function loadFriends() {
+    const kw = $('#searchFriendInput').val().trim().toLowerCase();
+    $.get('/get_friends', { keyword: kw }, data => {
+        if (data.status === 'success') updateFriendsList(data.friends);
+    });
+}
+
+/* =========  页面初始化  ========= */
+$(function () {
+    loadFarmInfo();
+    loadFriends();
+
+    $('#accountSelect').change(() => {
+        $.post('/change_account', { account: $('#accountSelect').val() }, () => {
+            loadFarmInfo();
+            loadFriends();
+        });
+    });
+
+    $('#refreshBtn').click(() => {
+        loadFarmInfo();
+    });
+
+    $('#refreshFriendsBtn').click(() => loadFriends());
+
+    $('#harvestBtn').click(() => {
+        const lands = $('.land-checkbox:checked').map((_, c) => parseInt(c.value) - 1).get();
+        $.post('/harvest', { land_indexes: lands }, r => {
+            showToast(r.response);
+            loadFarmInfo();
+        });
+    });
+
+    $('#waterBtn').click(() => {
+        const lands = $('.land-checkbox:checked').map((_, c) => parseInt(c.value) - 1).get();
+        $.post('/water', { land_indexes: lands }, r => {
+            showToast(r.response);
+            loadFarmInfo();
+        });
+    });
+
+    $('#fertilizeBtn').click(() => {
+        $.get('/get_fertilizers', d => {
+            if (d.status !== 'success') return showToast('无法加载肥料', 'error');
+            let html = '<div class="list-group">';
+            d.fertilizers.forEach((f, i) => {
+                html += `<label class="list-group-item">
+                            <input type="radio" name="fertilizer" value="${f.item_id}" ${!i ? 'checked' : ''}>
+                            ${f.name} (${f.price}跳跳点数)
+                         </label>`;
+            });
+            html += '</div>';
+            $('#fertilizerList').html(html);
+            new bootstrap.Modal(document.getElementById('fertilizerModal')).show();
+        });
+    });
+
+    $('#confirmFertilizeBtn').click(() => {
+        const id = $('input[name="fertilizer"]:checked').val();
+        const lands = $('.land-checkbox:checked').map((_, c) => parseInt(c.value) - 1).get();
+        $.post('/fertilize', { fertilizer_id: id, land_indexes: lands }, r => {
+            showToast(r.response);
+            loadFarmInfo();
+            $('#fertilizerModal').modal('hide');
+        });
+    });
+
+    $('#clearBtn').click(() => {
+        if (!confirm('确定要清空选中的地块吗？此操作不可撤销！')) return;
+        const lands = $('.land-checkbox:checked').map((_, c) => parseInt(c.value) - 1).get();
+        $.post('/clear', { land_indexes: lands }, r => {
+            showToast(r.response);
+            loadFarmInfo();
+        });
+    });
+
+    $('#buyFertilizerBtn').click(() => {
+        $.get('/get_fertilizers', d => {
+            if (d.status !== 'success') return showToast('无法加载肥料', 'error');
+            let html = '<div class="list-group">';
+            d.fertilizers.forEach((f, i) => {
+                html += `<label class="list-group-item">
+                            <input type="radio" name="buy_fertilizer" value="${f.item_id}" ${!i ? 'checked' : ''}>
+                            ${f.name} (${f.price}跳跳点数)
+                         </label>`;
+            });
+            html += '</div>';
+            $('#buyFertilizerList').html(html);
+            new bootstrap.Modal(document.getElementById('buyFertilizerModal')).show();
+        });
+    });
+
+    $('#confirmBuyFertilizerBtn').click(() => {
+        const id = $('input[name="buy_fertilizer"]:checked').val();
+        $.post('/buy_fertilizer', { product_id: id }, r => {
+            showToast(r.response);
+            $('#buyFertilizerModal').modal('hide');
+        });
+    });
+
+    $('#stealBtn').click(() => {
+        const friends = $('.friend-checkbox:checked').map((_, c) => c.value).get();
+        $.post('/steal', { friend_uids: friends }, r => {
+            showToast(r.response);
+            loadFarmInfo();
+            friends.forEach(uid => {
+                $.post('/get_friend_farm', { uid }, res => {
+                    if (res.status === 'success') {
+                        $(`#friendsList tr[data-uid="${uid}"]`).replaceWith(buildFriendRow(res.data));
+                    }
+                });
+            });
+        });
+    });
+
+    $('#selectAllBtn').click(() => {
+        const all = $('.friend-checkbox').length === $('.friend-checkbox:checked').length;
+        $('.friend-checkbox').prop('checked', !all);
+    });
+
+    $('#selectAllFriends').on('change', function () {
+        $('.friend-checkbox').prop('checked', this.checked);
+    });
+
+    $('#searchFriendBtn').click(loadFriends);
+    $('#clearSearchBtn').click(() => {
+        $('#searchFriendInput').val('');
+        loadFriends();
+    });
+    $('#searchFriendInput').keypress(e => e.which === 13 && loadFriends());
+
+    $('#confirmAddBtn').click(() => {
+        const auth = $('#authInput').val().trim();
+        if (!auth) return showToast('请输入 Authorization', 'error');
+        $.post('/add_account', { auth }, r => {
+            if (r.status === 'success') {
+                $('#accountSelect').empty();
+                r.accounts.forEach(a => $('#accountSelect').append(new Option(a, a)));
+                $('#accountSelect').val(r.account).trigger('change');
+                $('#addAccountModal').modal('hide');
+                $('#authInput').val('');
+                showToast('账号添加成功');
+            } else {
+                showToast(r.message, 'error');
+            }
+        });
+    });
+
+    $(document).on('click', '.view-friend-btn', function () {
+        const uid = $(this).data('uid');
+        const nick = $(this).data('nick');
+        $.post('/get_friend_farm', { uid }, res => {
+            if (res.status === 'success') {
+                const html = `
+                <div class="modal fade" id="friendFarmModal" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header"><h5 class="modal-title">${nick} 的农场</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <span class="badge bg-primary me-2">农场等级: ${res.data.farm_level}</span>
+                                    <span class="badge bg-success me-2">经验值: ${res.data.farm_exp}</span>
+                                    <span class="badge bg-warning">蔬菜摊等级: ${res.data.veg_stall_level}</span>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-hover">
+                                        <thead><tr><th>地块</th><th>作物</th><th>状态</th><th>最后浇水</th><th>水分维持</th><th>被偷次数</th><th>祈福状态</th><th>肥料</th></tr></thead>
+                                        <tbody>
+                                        ${res.data.lands.map(l => `
+                                            <tr>
+                                                <td>${l.index}</td><td>${l.crop_name}</td>
+                                                <td class="${l.mature==='已熟'?'text-success':'text-warning'}">${l.mature}</td>
+                                                <td>${l.water_time}</td><td>${l.wet_time}</td>
+                                                <td>${l.stolen_count}</td><td>${l.pray_status}</td><td>${l.fertilizers}</td>
+                                            </tr>`).join('')}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+                $('body').append(html);
+                new bootstrap.Modal(document.getElementById('friendFarmModal')).show();
+                $('#friendFarmModal').on('hidden.bs.modal', () => $('#friendFarmModal').remove());
+            }
+        });
+    });
+
+    /* 日志窗口控制 */
+    $('#openLogBtn').click(() => { $('#logFloat').show(); $('#openLogBtn').hide(); });
+    $('#toggleLogBtn').click(() => { $('#logFloat').hide(); $('#openLogBtn').show(); });
+    $('#scrollToLatestBtn').click(() => {
+        const $c = $('#logContent');
+        $c.scrollTop($c[0].scrollHeight);
+    });
+
+    /* 每 1 秒拉日志（不清空） */
+    setInterval(() => {
+        $.get('/get_results', data => {
+            data.results.forEach(r => {
+                const $line = $('<div>').addClass(r.status === 'error' ? 'text-danger' : 'text-success').text(r.text);
+                $('#logContent').append($line);
+            });
+        });
+    }, 1000);
+
+    /* 手动清空日志 */
+    $('#clearResultsBtn').click(() => {
+        $('#logContent').empty();
+        $.post('/clear_results');
+    });
+});
+</script>
+</body>
+</html>

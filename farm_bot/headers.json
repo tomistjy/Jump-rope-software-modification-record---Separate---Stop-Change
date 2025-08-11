@@ -1,0 +1,21 @@
+{
+    "User-Agent": "Mozilla/5.0 (Linux; Android 12; 21091116AC Build/V417IR; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/101.0.4951.61 Mobile Safari/537.36",
+    "Connection": "close",
+    "Accept": "*/*",
+    "Accept-Encoding": "gzip",
+    "Content-Type": "application/json",
+    "Cookie": "acw_tc=ac11000117538680237588324e647b17355604a102996c494b42b9cc3d488a; Hm_lvt_906658e7563d9820b4b1dc05e757c682=1753576990,1753837345,1753850232,1753859036",
+    "Proxy-Connection": "close",
+    "X-Gkid-appType": "iOS",
+    "X-Gkid-RequestId": "72F7ED05-E9BB-4A71-A64A-34280F8FCF0D",
+    "X-Gkid-deviceIP": "192.168.1.23",
+    "X-Gkid-deviceReal": "1",
+    "X-Gkid-appVersion": "4.0.66",
+    "X-Gkid-appName": "",
+    "X-Gkid-idfa": "",
+    "X-Gkid-systemVersion": "16.7.10",
+    "X-Littlelights-Source": "gkid",
+    "X-Gkid-uuid": "BCDD6E7B-6CF3-4A7D-A84C-A120AB4F8900",
+    "X-Gkid-deviceName": "iPad 5 (WiFi)",
+    "X-Gkid-Flavor": "App Store"
+}

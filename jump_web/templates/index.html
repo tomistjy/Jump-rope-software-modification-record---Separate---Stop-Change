@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>运动数据模拟器</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        body{background:#f8f9fa;padding:20px}
+        .card{margin-bottom:20px;box-shadow:0 4px 6px rgba(0,0,0,.1)}
+        .avatar{width:60px;height:60px;border-radius:50%;object-fit:cover}
+        #resultContainer{background:#343a40;color:#e9ecef;font-family:Consolas,monospace;padding:15px;border-radius:5px;height:400px;overflow-y:auto;white-space:pre-wrap}
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1 class="text-center mb-4">运动数据模拟器</h1>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="d-flex align-items-center mb-3">
+                <select id="accountSelect" class="form-select me-2" style="width:200px">
+                    {% for a in accounts %}
+                    <option value="{{ a }}" {% if a==current_user %}selected{% endif %}>{{ a }}</option>
+                    {% endfor %}
+                </select>
+                <button class="btn btn-primary me-2" id="refreshBtn"><i class="bi bi-arrow-clockwise"></i> 刷新</button>
+                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addAccountModal"><i class="bi bi-plus-lg"></i> 添加用户</button>
+            </div>
+            <div id="userInfoCard" class="user-info">
+                <div class="d-flex justify-content-center"><div class="spinner-border text-primary"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">操作</h5>
+            <div class="d-flex flex-wrap">
+                <button class="btn btn-primary m-1 btn-action" data-action="跳绳">🎗 跳绳10分钟</button>
+                <button class="btn btn-primary m-1 btn-action" data-action="水果总记录">🍒 水果总记录</button>
+                <button class="btn btn-primary m-1 btn-action" data-action="水果活动记录">🍒 水果活动记录</button>
+                <button class="btn btn-primary m-1 btn-action" data-action="吃豆人">👻 吃豆人</button>
+                <button class="btn btn-primary m-1 btn-action" data-action="极限跑酷">🎮 极限跑酷</button>
+                <button class="btn btn-primary m-1 btn-action" data-action="灵动飞龙">🐉 灵动飞龙</button>
+                <button class="btn btn-primary m-1 btn-action" data-action="敏捷火枪手">🔫 敏捷火枪手</button>
+                <button class="btn btn-primary m-1 btn-action" data-action="动感拳击">🥊 动感拳击</button>
+                <button class="btn btn-primary m-1 btn-action" data-action="跳跳币">💰 500跳跳币</button>
+                <button class="btn btn-primary m-1 btn-action" data-action="洞洞书">📖 洞洞书</button>
+                <button class="btn btn-primary m-1 btn-action" data-action="滚动刺桶">🛢️ 滚动刺桶</button>
+                <button class="btn btn-primary m-1 btn-action" data-action="回旋镖">🥟 回旋镖</button>
+                <button class="btn btn-primary m-1 btn-action" data-action="太空弹跳">🚀 太空弹跳</button>
+                <button class="btn btn-primary m-1 btn-action" data-action="大跳绳">〰 大跳绳</button>
+                <button class="btn btn-primary m-1 btn-action" data-action="顶顶砖块">🧱 顶顶砖块</button>
+                <button class="btn btn-primary m-1 btn-action" data-action="呼啦圈">🌀 呼啦圈</button>
+                <button class="btn btn-primary m-1 btn-action" data-action="俯卧撑">🤸 俯卧撑</button>
+                <button class="btn btn-primary m-1 btn-action" data-action="前合掌">🙏 前合掌</button>
+                <button class="btn btn-primary m-1 btn-action" data-action="反向支撑">🛡️ 反向支撑</button>
+                <button class="btn btn-primary m-1 btn-action" data-action="1千米跑步">🏃‍ 1000米跑步</button>
+                <button class="btn btn-primary m-1 btn-action" data-action="户外跑">🏃 户外跑</button>
+                <button class="btn btn-primary m-1 btn-action" data-action="vip购买">🎟️ vip购买</button>
+                <button class="btn btn-primary m-1 btn-action" data-action="一万贝壳">🐚 10000贝壳</button>
+                <button class="btn btn-primary m-1 btn-action" data-action="一万钻石">💎 10000钻石</button>
+                <button class="btn btn-primary m-1 btn-action" data-action="一万扭蛋瓶">🥚 10000扭蛋瓶</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="d-flex justify-content-between mb-3">
+                <h5 class="card-title mb-0">执行结果</h5>
+                <button class="btn btn-danger btn-sm" id="clearResultsBtn"><i class="bi bi-trash"></i> 清空结果</button>
+            </div>
+            <div id="resultContainer"></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addAccountModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog"><div class="modal-content">
+        <div class="modal-header"><h5 class="modal-title">添加用户</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body">
+            <label class="form-label">Authorization</label>
+            <input type="text" class="form-control" id="authInput" placeholder="请输入Authorization">
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+            <button type="button" class="btn btn-primary" id="confirmAddBtn">确认添加</button>
+        </div>
+    </div></div>
+</div>
+<div class="card mt-3">
+    <div class="card-body text-center">
+        <a href="http://192.168.1.202:5001" target="_blank" class="btn btn-success btn-lg">
+            <i class="bi bi-flower1"></i> 农场助手
+        </a>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+<script>
+const bearer = `{{ bearer }}`;
+// ---------- 滚动控制 ----------
+let autoScroll = true;
+let lastResultCount = 0; // 跟踪上次结果数量
+
+// 监听滚动：用户离开底部就暂停自动滚动
+$('#resultContainer').on('scroll', function () {
+    const $this = $(this);
+    const isNearBottom = $this.scrollTop() + $this.innerHeight() >= $this[0].scrollHeight - 10;
+    autoScroll = isNearBottom;
+});
+
+$(function () {
+    // 页面初始化
+    loadUserInfo();
+    loadResults();
+    setInterval(loadResults, 1000);
+
+    // 账号切换
+    $('#accountSelect').change(function () {
+        $.post('/change_account', { account: this.value }, r => {
+            if (r.status === 'success') location.reload();
+        });
+    });
+
+    // 刷新按钮
+    $('#refreshBtn').click(loadUserInfo);
+
+    // 功能按钮
+    $(document).on('click', '.btn-action', function () {
+        const action = $(this).data('action');
+        $.post('/execute', { action: action }, () => loadResults());
+    });
+
+    // 清空结果
+    $('#clearResultsBtn').click(() => {
+        $.post('/clear_results', () => {
+            lastResultCount = 0; // 重置计数器
+            loadResults(true); // 强制刷新
+        });
+    });
+
+    // 添加账号
+    $('#confirmAddBtn').click(() => {
+        const auth = $('#authInput').val().trim();
+        if (!auth) return alert('请输入Authorization');
+        $.post('/add_account', { auth }, r => {
+            if (r.status === 'success') location.reload();
+            else alert(r.message);
+        });
+    });
+
+    // 加载用户信息
+    function loadUserInfo() {
+        $('#userInfoCard').html('<div class="d-flex justify-content-center"><div class="spinner-border text-primary"></div></div>');
+        $.get('/get_user_info', d => {
+            if (!d.user_info) {
+                $('#userInfoCard').html('<div class="text-danger text-center">无法获取用户信息</div>');
+                return;
+            }
+            const u = d.user_info, c = d.coin, e = d.exp_info, s = d.stat_info, w = d.wallet || {};
+            const dianshu = d.wallet?.virtual?.ttpoint || 0;  // 新增跳跳点数
+            const html = `
+                <div class="d-flex flex-wrap align-items-center">
+                    <img id="avatarImg" class="avatar me-3" src="https://placehold.co/60x60">
+                    <div class="me-4"><h5>${u.nick_name}</h5><p>学校：${u.school || '未知'}</p><p class="text-warning"><strong>能量豆：${c} 跳跳点数：${dianshu}</strong></p></div>
+                    <div class="me-4">
+                        ${e ? `<p>等级：Lv${e.level_no} (${e.exp_total}/${e.current_level_delta_exp})</p>` : ''}
+                        ${s ? `<p>已燃脂：${s.burned_calories} kcal</p><p>训练天数：${s.training_days}</p>` : ''}
+                    </div>
+                    <div>
+                        <p><strong>💰 钱包</strong></p>
+                        <div class="d-flex flex-wrap">
+                            <span class="me-2">跳跳币: ${w.wallet?.ttb_amount || 0}</span>
+                            <span class="me-2">钻石: ${w.store?.diamond_amount || 0}</span>
+                            <span class="me-2">扭蛋瓶: ${w.wallet?.bottle_amount || 0}</span>
+                            <span class="me-2">星贝壳: ${w.virtual?.starshell || 0}</span>
+                            <span>许愿币: ${w.virtual?.island_lottery_coin || 0}</span>
+                        </div>
+                        <p class="text-danger"><small>切水果vip购买-被修复别用</small></p>
+                    </div>
+                </div>`;
+            $('#userInfoCard').html(html);
+
+            // 头像
+            fetch('/proxy_avatar', { method: 'GET', headers: { Authorization: bearer } })
+                .then(r => r.ok ? r.blob() : Promise.reject())
+                .then(b => document.getElementById('avatarImg').src = URL.createObjectURL(b))
+                .catch(() => {});
+        }).fail(() => $('#userInfoCard').html('<div class="text-danger text-center">获取用户信息失败</div>'));
+    }
+
+    // 加载结果
+    function loadResults(force = false) {
+        $.get('/get_results', d => {
+            // 只有当结果数量变化或强制刷新时才更新DOM
+            if (!force && d.results.length === lastResultCount) return;
+            lastResultCount = d.results.length;
+        
+            const c = $('#resultContainer');
+            const wasScrolledToBottom = autoScroll;
+            const oldScrollHeight = c[0].scrollHeight;
+            const oldScrollTop = c[0].scrollTop;
+        
+            c.empty();
+            d.results.forEach(r => {
+                r.text.split('\n').forEach(l => {
+                    if (!l.trim()) return;
+                    const div = $('<div>');
+                    if (l.includes('✅')) div.addClass('text-success');
+                    else if (l.includes('❌')) div.addClass('text-danger');
+                    div.text(l);
+                    c.append(div);
+                });
+            });
+        
+            // 保持滚动位置
+            if (!wasScrolledToBottom) {
+                const newScrollHeight = c[0].scrollHeight;
+                c.scrollTop(oldScrollTop + (newScrollHeight - oldScrollHeight));
+            } else {
+                c.scrollTop(c[0].scrollHeight);
+            }
+        });
+    }
+});
+</script>
+</body>
+</html>
