@@ -3,8 +3,8 @@ import time
 import requests
 from pathlib import Path
 
-WIN_URL   = "https://api.tiantiantiaosheng.com/api2/sports_island/treasure/win"
-REWARD_URL = "https://api.tiantiantiaosheng.com/api2/sports_island/treasure/reward"
+WIN_URL   = "（不公开，提示：）win"
+REWARD_URL = "（不公开，提示：）reward"
 
 HEADERS_TEMPLATE = {
     "User-Agent": "Mozilla/5.0 (Linux; Android 12; 21091116AC Build/V417IR; wv) AppleWebKit/537.36 "
@@ -110,4 +110,5 @@ def main():
             claim_reward(info["bearer"])
 
 if __name__ == "__main__":
+
     main()
