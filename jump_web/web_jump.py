@@ -17,7 +17,7 @@ HEADERS = {
     "Accept": "*/*",
     "Accept-Encoding": "gzip",
     "Content-Type": "application/json",
-    "Cookie": "acw_tc=ac11000117538680237588324e647b17355604a102996c494b42b9cc3d488a; Hm_lvt_906658e7563d9820b4b1dc05e757c682=1753576990,1753837345,1753850232,1753859036",
+    "Cookie": "",
     "Proxy-Connection": "close",
     "X-Gkid-appType": "iOS",
     "X-Gkid-RequestId": "72F7ED05-E9BB-4A71-A64A-34280F8FCF0D",
@@ -35,17 +35,9 @@ HEADERS = {
 
 # ---------- 账号映射 ----------
 ACCOUNT_MAP = {
-    "菲原": {
-        "bearer": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMWU1ODFlMzItM2YwOS00NmNiLTkxN2QtMmJhOGJiMmI2N2YwIiwiZXhwIjoxNzU2MzkyODg0MDAwLCJjb2RlIjo4NDEzMzF9.UE9WxK5fHrSq7L2p4tTYagCXdUaQf8c2pof7uZXApXY",
-        "usid": "1e581e32-3f09-46cb-917d-2ba8bb2b67f0"
-    },
-    "菲新": {
-        "bearer": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiN2IyODgwNmMtMDJhNy00MWYyLTg1M2QtY2M1MTI0NzA1ZTBlIiwiZXhwIjoxNzU2ODIxMzIyMDAwLCJjb2RlIjozMTkyMzF9.1BhxUj6HIHlAqws8VZMnnLtCqX95uHsQ66l4z67buIQ",
-        "usid": "7b28806c-02a7-41f2-853d-cc5124705e0e"
-    },
-    "测试": {
-        "bearer": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiNjYxYWE0NTUtYzRjZS00YzE3LThkMzEtYTk3ZjZkNGViNmZiIiwiZXhwIjoxNzU2OTc3NTIwMDAwLCJjb2RlIjowfQ.i1EU_m9UH5ROHsYdGlv6xLMUjWptYSMrGVURvdj6ABs",
-        "usid": "661aa455-c4ce-4c17-8d31-a97f6d4eb6fb"
+    "名字": {
+        "bearer": "Bearer 。。。。。。",
+        "usid": "1e。。。。。。"
     }
 }
 
@@ -140,7 +132,7 @@ def fetch_user_info():
         print(f"[DEBUG] 使用的 bearer token: {bearer[:30]}...{bearer[-30:]}")
         print(f"[DEBUG] 用户ID (usid): {usid}")
 
-        url = "https://api.tiantiantiaosheng.com/api/user/user_info"
+        url = "（不公开，提示：）user_info"
         headers = {"Authorization": bearer}
         
         # 调试输出 - 显示请求详情
@@ -196,7 +188,7 @@ def fetch_user_info():
 def fetch_exp_info():
     global exp_info
     try:
-        url = "https://api.tiantiantiaosheng.com/api/user/exp/current_detail"
+        url = "（不公开，提示：）current_detail"
         resp = requests.get(url, headers={"Authorization": bearer}, timeout=10)
         if resp.status_code == 200 and resp.json().get("code") == 0:
             exp_info = resp.json()["data"]
@@ -206,7 +198,7 @@ def fetch_exp_info():
 def fetch_statistics():
     global stat_info
     try:
-        url = "https://api.tiantiantiaosheng.com/api/user/drill_record/statistics_v2"
+        url = "（不公开，提示：）statistics_v2"
         resp = requests.get(url, headers={"Authorization": bearer}, timeout=10)
         if resp.status_code == 200 and resp.json().get("code") == 0:
             stat_info = resp.json()["data"]
@@ -234,31 +226,31 @@ def add_result(game_name, result):
             results.pop(0)
 
 # ---------- 游戏刷分 ----------
-def brush_jump_rope():          return make_request("https://api.tiantiantiaosheng.com/api/user/drill_record_upload", _load_json_body("跳绳"))
-def brush_fruit_total():        return make_request("https://api.tiantiantiaosheng.com/api/user/drill_record_upload", _load_json_body("水果总记录"))
-def brush_fruit_event():        return make_request("https://api.tiantiantiaosheng.com/api2/sfruit_ninja/update_score", _load_json_body("水果活动记录"))
-def brush_pacman():             return make_request("https://api.tiantiantiaosheng.com/api/user/drill_record_upload", _load_json_body("吃豆人"))
-def brush_parkour():            return make_request("https://api.tiantiantiaosheng.com/api/user/drill_record_upload", _load_json_body("极限跑酷"))
-def brush_dragon():             return make_request("https://api.tiantiantiaosheng.com/api/user/drill_record_upload", _load_json_body("灵动飞龙"))
-def brush_soldier():            return make_request("https://api.tiantiantiaosheng.com/api/user/drill_record_upload", _load_json_body("敏捷火枪手"))
-def brush_boxing():             return make_request("https://api.tiantiantiaosheng.com/api/user/drill_record_upload", _load_json_body("动感拳击"))
-def brush_coins():              return make_request("https://api.tiantiantiaosheng.com/api2/invite_2412/receive", {"stage_id": "stage_2"})
-def brush_hole_book():          return make_request("https://api.tiantiantiaosheng.com/api/user/drill_record_upload", _load_json_body("洞洞书"))
-def brush_rolling_assassin():   return make_request("https://api.tiantiantiaosheng.com/api/user/drill_record_upload", _load_json_body("滚动刺桶"))
-def brush_boomerang():          return make_request("https://api.tiantiantiaosheng.com/api/user/drill_record_upload", _load_json_body("回旋镖"))
-def brush_squat_jump():         return make_request("https://api.tiantiantiaosheng.com/api/user/drill_record_upload", _load_json_body("太空弹跳"))
-def brush_big_jump():           return make_request("https://api.tiantiantiaosheng.com/api/user/drill_record_upload", _load_json_body("大跳绳"))
-def brush_jumping_brick():      return make_request("https://api.tiantiantiaosheng.com/api/user/drill_record_upload", _load_json_body("顶顶砖块"))
-def Hula_hoops():               return make_request("https://api.tiantiantiaosheng.com/api/user/drill_record_upload", _load_json_body("呼啦圈"))
-def push_up():                  return make_request("https://api.tiantiantiaosheng.com/api/user/drill_record_upload", _load_json_body("俯卧撑"))
-def Front_palms_together():     return make_request("https://api.tiantiantiaosheng.com/api/user/drill_record_upload", _load_json_body("前合掌"))
-def Reverse_support():          return make_request("https://api.tiantiantiaosheng.com/api/user/drill_record_upload", _load_json_body("反向支撑"))
-def Run_outdoors():             return make_request("https://api.tiantiantiaosheng.com/api/user/drill_record_upload", _load_json_body("户外跑"))
-def one_km_run():               return make_request("https://api.tiantiantiaosheng.com/api/user/drill_record_upload", _load_json_body("1千米跑步"))
-def VIP_purchase():             return make_request("https://api.tiantiantiaosheng.com/api2/sfruit_ninja/add_month_vip", {"month": current_date})
-def Ten_thousand_shells():      return make_request("https://api.tiantiantiaosheng.com/api2/virtual_mall/activity_shop/buy_product_v2", {"product_id": "515527804314456100", "product_price": 1000, "activity_shop_id": "starshells_shop", "number": 1000})
-def Ten_thousand_diamond():     return make_request("https://api.tiantiantiaosheng.com/api2/sport_card/diamond_exchange", {"diamond_delta": 10000, "ttb_delta": 0, "ttp_delta": 10000})
-def Ten_thousand_twisted_egg_bottles(): return make_request("https://api.tiantiantiaosheng.com/api2/common_lottery/exchange_db_v2", {"db_number": 10000, "ttpoint_number": 10000, "currencies": [{"currency_type": "wish", "amount": 0}], "scene_name": "basketball_2023"})
+def brush_jump_rope():          return make_request("（不公开，提示：）drill_record_upload", _load_json_body("跳绳"))
+def brush_fruit_total():        return make_request("（不公开，提示：）drill_record_upload", _load_json_body("水果总记录"))
+def brush_fruit_event():        return make_request("（不公开，提示：）update_score", _load_json_body("水果活动记录"))
+def brush_pacman():             return make_request("（不公开，提示：）drill_record_upload", _load_json_body("吃豆人"))
+def brush_parkour():            return make_request("（不公开，提示：）drill_record_upload", _load_json_body("极限跑酷"))
+def brush_dragon():             return make_request("（不公开，提示：）drill_record_upload", _load_json_body("灵动飞龙"))
+def brush_soldier():            return make_request("（不公开，提示：）drill_record_upload", _load_json_body("敏捷火枪手"))
+def brush_boxing():             return make_request("（不公开，提示：）drill_record_upload", _load_json_body("动感拳击"))
+def brush_coins():              return make_request("（不公开，提示：）receive", {"stage_id": "stage_2"})
+def brush_hole_book():          return make_request("（不公开，提示：）drill_record_upload", _load_json_body("洞洞书"))
+def brush_rolling_assassin():   return make_request("（不公开，提示：）drill_record_upload", _load_json_body("滚动刺桶"))
+def brush_boomerang():          return make_request("（不公开，提示：）drill_record_upload", _load_json_body("回旋镖"))
+def brush_squat_jump():         return make_request("（不公开，提示：）drill_record_upload", _load_json_body("太空弹跳"))
+def brush_big_jump():           return make_request("（不公开，提示：）drill_record_upload", _load_json_body("大跳绳"))
+def brush_jumping_brick():      return make_request("（不公开，提示：）drill_record_upload", _load_json_body("顶顶砖块"))
+def Hula_hoops():               return make_request("（不公开，提示：）drill_record_upload", _load_json_body("呼啦圈"))
+def push_up():                  return make_request("（不公开，提示：）drill_record_upload", _load_json_body("俯卧撑"))
+def Front_palms_together():     return make_request("（不公开，提示：）drill_record_upload", _load_json_body("前合掌"))
+def Reverse_support():          return make_request("（不公开，提示：）drill_record_upload", _load_json_body("反向支撑"))
+def Run_outdoors():             return make_request("（不公开，提示：）drill_record_upload", _load_json_body("户外跑"))
+def one_km_run():               return make_request("（不公开，提示：）drill_record_upload", _load_json_body("1千米跑步"))
+def VIP_purchase():             return make_request("（不公开，提示：）add_month_vip", {"month": current_date})
+def Ten_thousand_shells():      return make_request("（不公开，提示：）buy_product_v2", {"product_id": "515527804314456100", "product_price": 1000, "activity_shop_id": "starshells_shop", "number": 1000})
+def Ten_thousand_diamond():     return make_request("（不公开，提示：）diamond_exchange", {"diamond_delta": 10000, "ttb_delta": 0, "ttp_delta": 10000})
+def Ten_thousand_twisted_egg_bottles(): return make_request("（不公开，提示：）exchange_db_v2", {"db_number": 10000, "ttpoint_number": 10000, "currencies": [{"currency_type": "wish", "amount": 0}], "scene_name": "basketball_2023"})
 
 # ---------- Flask 路由 ----------
 @app.route('/')
@@ -288,9 +280,9 @@ def proxy_avatar():
 def get_user_info():
     wallet = {}
     for key, url in [
-        ("wallet", "https://api.tiantiantiaosheng.com/api2/wallet/info"),
-        ("store", "https://api.tiantiantiaosheng.com/api2/sport_card/store_info"),
-        ("virtual", "https://api.tiantiantiaosheng.com/api2/virtual_wallet/info"),
+        ("wallet", "（不公开，提示：）wallet/info"),
+        ("store", "（不公开，提示：）sport_card/store_info"),
+        ("virtual", "（不公开，提示：）virtual_wallet/info"),
     ]:
         try:
             resp = requests.get(url, headers={"Authorization": bearer}, timeout=5)
@@ -325,7 +317,7 @@ def add_account():
     if not auth:
         return jsonify({"status": "error", "message": "请输入Authorization"})
     try:
-        url = "https://api.tiantiantiaosheng.com/api/user/user_info"
+        url = "（不公开，提示：）user_info"
         resp = requests.get(url, headers={"Authorization": auth}, timeout=10)
         if resp.status_code != 200 or resp.json().get("code") != 0:
             return jsonify({"status": "error", "message": "Authorization无效或网络异常"})
