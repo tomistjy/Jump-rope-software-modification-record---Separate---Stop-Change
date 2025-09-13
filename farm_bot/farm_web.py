@@ -59,7 +59,7 @@ class FertilizerClient:
         try:
             headers = {**HEADERS, "Authorization": self.auth}
             resp = requests.get(
-                "https://api.tiantiantiaosheng.com/api2/sports_island/farm/hot_sale_products?activity_id=ac_farm_fertilizer",
+                "（不公开，提示：）ac_farm_fertilizer",
                 headers=headers, timeout=10)
             if resp.status_code == 200 and resp.json().get("code") == 0:
                 self.products = resp.json()["data"]["product_list"]
@@ -159,7 +159,7 @@ def refresh_farm():
     global farmland_data
     if not current_user_id:
         return {"status": "error", "response": "未选择用户"}
-    result = api_get(f"https://api.tiantiantiaosheng.com/api2/sports_island/farm/farm_info?host_user_id={current_user_id}")
+    result = api_get(f"（不公开，提示：）{current_user_id}")
     if result["status"] == 200 and isinstance(result["response"], dict) and result["response"].get("code") == 0:
         farmland_data = result["response"]["data"]["farmland_info"]
         return {"status": "success", "response": result["response"]["data"]}
@@ -180,7 +180,7 @@ def auto_harvest(land_indexes=None):
             "version": land["version"],
             "finish_guide": False
         }
-        result = api_post("https://api.tiantiantiaosheng.com/api2/sports_island/farm/harvest", payload)
+        result = api_post("（不公开，提示：）harvest", payload)
         if result["status"] == 200 and isinstance(result["response"], dict) and result["response"].get("code") == 0:
             count += 1
         add_result(f"收获地块 {land['farmland_index'] + 1}", result)
@@ -202,7 +202,7 @@ def auto_watering(land_indexes=None):
             "version": land["version"],
             "finish_guide": False
         }
-        result = api_post("https://api.tiantiantiaosheng.com/api2/sports_island/farm/watering", payload)
+        result = api_post("（不公开，提示：）watering", payload)
         add_result(f"浇水地块 {land['farmland_index'] + 1}", result)
         time.sleep(0.25)
     return {"status": "success", "response": "浇水完毕"}
@@ -221,7 +221,7 @@ def auto_fertilize(fertilizer_id, land_indexes=None):
             "fertilizer_id": fertilizer_id,
             "version": land["version"]
         }
-        result = api_post("https://api.tiantiantiaosheng.com/api2/sports_island/farm/fertilize", payload)
+        result = api_post("（不公开，提示：）fertilize", payload)
         if result["status"] == 200 and isinstance(result["response"], dict) and result["response"].get("code") == 0:
             count += 1
         add_result(f"施肥地块 {land['farmland_index'] + 1}", result)
@@ -242,14 +242,14 @@ def clear_farm(land_indexes=None):
                 "version": land["version"]
             }]
         }
-        result = api_post("https://api.tiantiantiaosheng.com/api2/sports_island/farm/remove", payload)
+        result = api_post("（不公开，提示：）remove", payload)
         add_result(f"清空地块 {land['farmland_index'] + 1}", result)
         time.sleep(0.3)
     return {"status": "success", "response": "清空操作完成"}
 
 # ---------- 偷菜功能 ----------
 def load_friends():
-    result = api_get("https://api.tiantiantiaosheng.com/api2/sports_island/friends/simple?contains_farm=1")
+    result = api_get("（不公开，提示：）contains_farm=1")
     if result["status"] == 200 and isinstance(result["response"], dict) and result["response"].get("code") == 0:
         friends = result["response"]["data"]["friend_list"]
         for friend in friends:
@@ -258,7 +258,7 @@ def load_friends():
     return result
 
 def load_friend_farm(uid):
-    result = api_get(f"https://api.tiantiantiaosheng.com/api2/sports_island/farm/farm_info?host_user_id={uid}")
+    result = api_get(f"（不公开，提示：）host_user_id={uid}")
     if result["status"] == 200 and isinstance(result["response"], dict) and result["response"].get("code") == 0:
         friend_cache[uid] = result["response"]["data"]
         return {"status": "success", "response": result["response"]["data"]}
@@ -271,7 +271,7 @@ def steal_veg(uid, farmland_index, crop_id, version):
         "crop_id": crop_id,
         "version": version
     }
-    return api_post("https://api.tiantiantiaosheng.com/api2/sports_island/farm/steal_veg", payload)
+    return api_post("（不公开，提示：）steal_veg", payload)
 
 def auto_steal(friend_uids=None):
     if not friend_uids:
@@ -342,7 +342,7 @@ def add_account():
     if not auth:
         return jsonify({"status": "error", "message": "请输入Authorization"})
     try:
-        url = "https://api.tiantiantiaosheng.com/api/user/user_info"
+        url = "（不公开，提示：）user_info"
         resp = requests.get(url, headers={"Authorization": auth}, timeout=10)
         if resp.status_code != 200 or resp.json().get("code") != 0:
             return jsonify({"status": "error", "message": "Authorization无效或网络异常"})
@@ -563,7 +563,7 @@ def buy_fertilizer():
         "number": 1
     }
     result = api_post(
-        "https://api.tiantiantiaosheng.com/api2/virtual_mall/activity_shop/buy_product_v2",
+        "（不公开，提示：）buy_product_v2",
         payload)
     add_result(f"购买肥料 {product['name']}", result)
     return jsonify(result)
@@ -1150,4 +1150,5 @@ if __name__ == '__main__':
         f.write(INDEX_HTML)
     fertilizer_client.load_product_names()
     Thread(target=preload_all_friends_once, daemon=True).start()
+
     app.run(host='0.0.0.0', port=5001, debug=True)
