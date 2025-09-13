@@ -1,14 +1,6 @@
 {
-    "菲原": {
-        "bearer": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMWU1ODFlMzItM2YwOS00NmNiLTkxN2QtMmJhOGJiMmI2N2YwIiwiZXhwIjoxNzU2MzkyODg0MDAwLCJjb2RlIjo4NDEzMzF9.UE9WxK5fHrSq7L2p4tTYagCXdUaQf8c2pof7uZXApXY",
-        "usid": "1e581e32-3f09-46cb-917d-2ba8bb2b67f0"
-    },
-    "菲新": {
-        "bearer": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiN2IyODgwNmMtMDJhNy00MWYyLTg1M2QtY2M1MTI0NzA1ZTBlIiwiZXhwIjoxNzU2ODIxMzIyMDAwLCJjb2RlIjozMTkyMzF9.1BhxUj6HIHlAqws8VZMnnLtCqX95uHsQ66l4z67buIQ",
-        "usid": "7b28806c-02a7-41f2-853d-cc5124705e0e"
-    },
-    "测试": {
-        "bearer": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiNjYxYWE0NTUtYzRjZS00YzE3LThkMzEtYTk3ZjZkNGViNmZiIiwiZXhwIjoxNzU2OTc3NTIwMDAwLCJjb2RlIjowfQ.i1EU_m9UH5ROHsYdGlv6xLMUjWptYSMrGVURvdj6ABs",
-        "usid": "661aa455-c4ce-4c17-8d31-a97f6d4eb6fb"
+    "你的名字": {
+        "bearer": "Bearer eyJ0e......",
+        "usid": "1e........"
     }
 }
