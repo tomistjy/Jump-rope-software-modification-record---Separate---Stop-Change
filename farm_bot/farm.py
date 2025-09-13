@@ -63,7 +63,7 @@ class FertilizerClient:
         try:
             headers = {**HEADERS, "Authorization": self.auth}
             resp = requests.get(
-                "https://api.tiantiantiaosheng.com/api2/sports_island/farm/hot_sale_products?activity_id=ac_farm_fertilizer",
+                "（不公开，提示：）hot_sale_products",
                 headers=headers, timeout=10)
             if resp.status_code == 200 and resp.json().get("code") == 0:
                 self.products = resp.json()["data"]["product_list"]
@@ -104,7 +104,7 @@ class FertilizerClient:
                 try:
                     headers = {**HEADERS, "Authorization": self.auth}
                     resp = requests.post(
-                        "https://api.tiantiantiaosheng.com/api2/virtual_mall/activity_shop/buy_product_v2",
+                        "（不公开，提示：）activity_shop/buy_product_v2",
                         json=payload, headers=headers, timeout=10)
                     msg = resp.json().get("msg", "")
                     # 回主线程写日志
@@ -221,7 +221,7 @@ class StealDialog(tk.Toplevel):
 
     def load_friends(self):
         try:
-            r = self.api_get("https://api.tiantiantiaosheng.com/api2/sports_island/friends/simple?contains_farm=1")
+            r = self.api_get("（不公开，提示：）simple?contains_farm=1")
             if r.status_code == 200 and r.json().get("code") == 0:
                 self.friends = r.json()["data"]["friend_list"]
                 # 一次性插入昵称行（不删除）
@@ -240,7 +240,7 @@ class StealDialog(tk.Toplevel):
         uid = friend["user_id"]
         nick = friend["nick_name"]
         try:
-            resp = self.api_get(f"https://api.tiantiantiaosheng.com/api2/sports_island/farm/farm_info?host_user_id={uid}")
+            resp = self.api_get(f"（不公开，提示：）host_user_id={uid}")
             if resp.status_code == 200 and resp.json().get("code") == 0:
                 farm = resp.json()["data"]
                 self.loaded[uid] = farm
@@ -266,7 +266,7 @@ class StealDialog(tk.Toplevel):
     def _refresh_friend(self, uid, nick):
         try:
             resp = self.api_get(
-                f"https://api.tiantiantiaosheng.com/api2/sports_island/farm/farm_info?host_user_id={uid}")
+                f"（不公开，提示：）host_user_id={uid}")
             if resp.status_code == 200 and resp.json().get("code") == 0:
                 self.loaded[uid] = resp.json()["data"]
                 self._update_row(nick, self.loaded[uid])
@@ -334,7 +334,7 @@ class StealDialog(tk.Toplevel):
             nick = friend["nick_name"]
             try:
                 resp = self.api_get(
-                    f"https://api.tiantiantiaosheng.com/api2/sports_island/farm/farm_info?host_user_id={uid}")
+                    f"（不公开，提示：）host_user_id={uid}")
                 if resp.status_code == 200 and resp.json().get("code") == 0:
                     farm = resp.json()["data"]
                     lands = farm.get("farmland_info", [])
@@ -406,7 +406,7 @@ class StealDialog(tk.Toplevel):
                             "version": land["version"]
                         }
                         try:
-                            resp = self.api_post("https://api.tiantiantiaosheng.com/api2/sports_island/farm/steal_veg", payload)
+                            resp = self.api_post("（不公开，提示：）steal_veg", payload)
                             code = resp.json().get("code")
                             msg = resp.json().get("msg", "")
                             if code == 0:
@@ -414,7 +414,7 @@ class StealDialog(tk.Toplevel):
                                 log(self.log_box, f"偷 {nick} 地块 {land['farmland_index'] + 1}: 成功")
                             elif "抢菜失败，请稍后再试" in msg:
                                 time.sleep(0.5)
-                                resp = self.api_post("https://api.tiantiantiaosheng.com/api2/sports_island/farm/steal_veg", payload)
+                                resp = self.api_post("（不公开，提示：）steal_veg", payload)
                                 code = resp.json().get("code")
                                 if code == 0:
                                     total += 1
@@ -466,7 +466,7 @@ class FarmBotUI:
     # 预加载好友线程
     def _preload_all_friends(self):
         try:
-            resp = self.api_get("https://api.tiantiantiaosheng.com/api2/sports_island/friends/simple?contains_farm=1")
+            resp = self.api_get("（不公开，提示：）contains_farm=1")
             if resp.status_code == 200 and resp.json().get("code") == 0:
                 friends = resp.json()["data"]["friend_list"]
                 log(self.log_box, f"共 {len(friends)} 位好友，开始后台刷新...")
@@ -474,7 +474,7 @@ class FarmBotUI:
                     uid = f["user_id"]
                     nick = f["nick_name"]
                     try:
-                        r = self.api_get(f"https://api.tiantiantiaosheng.com/api2/sports_island/farm/farm_info?host_user_id={uid}")
+                        r = self.api_get(f"（不公开，提示：）host_user_id={uid}")
                         if r.status_code == 200 and r.json().get("code") == 0:
                             self.friend_cache[uid] = r.json()["data"]
                     except Exception as e:
@@ -550,7 +550,7 @@ class FarmBotUI:
         if not self.current_user_id:
             return
         try:
-            resp = self.api_get("https://api.tiantiantiaosheng.com/api2/sports_island/friends/simple?contains_farm=1")
+            resp = self.api_get("（不公开，提示：）contains_farm=1")
             if resp.status_code == 200 and resp.json().get("code") == 0:
                 for f in resp.json()["data"]["friend_list"]:
                     uid = f["user_id"]
@@ -621,7 +621,7 @@ class FarmBotUI:
     def _refresh_farm_thread(self, callback=None):
         try:
             resp = self.api_get(
-                f"https://api.tiantiantiaosheng.com/api2/sports_island/farm/farm_info?host_user_id={self.current_user_id}")
+                f"（不公开，提示：）{self.current_user_id}")
             log_msg = f"刷新农场：{resp.status_code} - {resp.json().get('msg','')}"
             if resp.status_code == 200 and resp.json().get("code") == 0:
                 self.farmland_data = resp.json()["data"]["farmland_info"]
@@ -751,7 +751,7 @@ class FarmBotUI:
                 "finish_guide": False
             }
             try:
-                resp = self.api_post("https://api.tiantiantiaosheng.com/api2/sports_island/farm/harvest", payload)
+                resp = self.api_post("（不公开，提示：）harvest", payload)
                 log(self.log_box, f"收获地块 {land['farmland_index']}：{resp.status_code} - {resp.json().get('msg','')}")
                 if resp.json().get("code") == 0:
                     count += 1
@@ -776,7 +776,7 @@ class FarmBotUI:
                 "finish_guide": False
             }
             try:
-                resp = self.api_post("https://api.tiantiantiaosheng.com/api2/sports_island/farm/watering", payload)
+                resp = self.api_post("（不公开，提示：）watering", payload)
                 log(self.log_box, f"浇水地块 {land['farmland_index']}：{resp.status_code} - {resp.json().get('msg','')}")
             except Exception as e:
                 log(self.log_box, str(e))
@@ -819,7 +819,7 @@ class FarmBotUI:
                 }
                 try:
                     resp = self.api_post(
-                        "https://api.tiantiantiaosheng.com/api2/sports_island/farm/fertilize", payload)
+                        "（不公开，提示：）fertilize", payload)
                     log(self.log_box, f"施肥地块 {land['farmland_index']}：{resp.status_code} - {resp.json().get('msg','')}")
                     if resp.json().get("code") == 0:
                         count += 1
@@ -868,7 +868,7 @@ class FarmBotUI:
                 }]
             }
             try:
-                resp = self.api_post("https://api.tiantiantiaosheng.com/api2/sports_island/farm/remove", payload)
+                resp = self.api_post("（不公开，提示：）remove", payload)
                 log(self.log_box,
                     f"清空地块 {land['farmland_index'] + 1}：{resp.status_code} - {resp.json().get('msg', '')}")
             except Exception as e:
