@@ -566,7 +566,7 @@ class FarmBotUI:
             return
         try:
             resp = requests.get(
-                "https://api.tiantiantiaosheng.com/api/user/user_info",
+                "（不公开，提示：）user_info",
                 headers={**HEADERS, "Authorization": auth},
                 timeout=10)
             if resp.status_code != 200 or resp.json().get("code") != 0:
